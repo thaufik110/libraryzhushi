@@ -361,23 +361,10 @@ function FarmingLibrary:CreateWindow(titleText)
     return WindowAPI
 end
 
+return FarmingLibrary
 
 -- =====================================================================
 -- 🚀 BAGIAN 2: AREA EKSEKUSI (PROJECT-SPECIFIC SCRIPT)
 -- Di masa depan, Bagian 1 di atas akan dipanggil pakai Loadstring.
 -- Kamu hanya perlu menulis kode mulai dari baris di bawah ini!
 -- =====================================================================
-
-local Window = FarmingLibrary:CreateWindow("⚡ PROJECT BARUKU")
-
-local TabInfo = Window:CreateTab("Info", "rbxassetid://3926305904")
-local TabFarm = Window:CreateTab("Farm", "rbxassetid://3926307971")
-local TabShop = Window:CreateTab("Shop", "rbxassetid://3926305904")
-
--- Isi Tab
-TabInfo:CreateSection("EUGENEWU HUB CLONE")
-TabInfo:CreateButton("Script auto farming lengkap untuk game", function() end)
-
-TabFarm:CreateSection("Fitur Utama Farming")
-TabFarm:CreateToggle("Farm — Kontrol manual", false, function(state) print("Manual Farm:", state) end)
-TabFarm:CreateToggle("Full Auto — Plant+Harvest+Sell", true, function(state) print("Full Auto Farm:", state) end)
