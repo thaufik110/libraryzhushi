@@ -1,5 +1,5 @@
 -- =====================================================================
--- 🛠️ BAGIAN 1: CORE LIBRARY (Ini yang nanti kamu upload ke GitHub Raw)
+-- 🛠️ MYCUSTOM UI LIBRARY (MULTI-THEME EDITION)
 -- =====================================================================
 local TweenService = game:GetService("TweenService")
 local UserInputService = game:GetService("UserInputService")
@@ -7,14 +7,26 @@ local PlayerGui = game:GetService("Players").LocalPlayer:WaitForChild("PlayerGui
 
 local FarmingLibrary = {}
 
-local Theme = {
-    MainBG = Color3.fromRGB(24, 24, 34),
-    SidebarBG = Color3.fromRGB(30, 30, 42),
-    ElementBG = Color3.fromRGB(35, 35, 48),
-    HoverBG = Color3.fromRGB(45, 45, 60),
-    Accent = Color3.fromRGB(255, 180, 50),
-    Text = Color3.fromRGB(255, 255, 255),
-    TextDark = Color3.fromRGB(170, 170, 190)
+-- ==========================================
+-- 🎨 KOLEKSI TEMA (KAVO + TEMA MODERN BARU)
+-- ==========================================
+local themeStyles = {
+    -- TEMA BAWAAN KAVO
+    DarkTheme = {SchemeColor = Color3.fromRGB(64, 64, 64), Background = Color3.fromRGB(0, 0, 0), Header = Color3.fromRGB(0, 0, 0), TextColor = Color3.fromRGB(255,255,255), ElementColor = Color3.fromRGB(20, 20, 20)},
+    LightTheme = {SchemeColor = Color3.fromRGB(150, 150, 150), Background = Color3.fromRGB(255,255,255), Header = Color3.fromRGB(200, 200, 200), TextColor = Color3.fromRGB(0,0,0), ElementColor = Color3.fromRGB(224, 224, 224)},
+    BloodTheme = {SchemeColor = Color3.fromRGB(227, 27, 27), Background = Color3.fromRGB(10, 10, 10), Header = Color3.fromRGB(5, 5, 5), TextColor = Color3.fromRGB(255,255,255), ElementColor = Color3.fromRGB(20, 20, 20)},
+    GrapeTheme = {SchemeColor = Color3.fromRGB(166, 71, 214), Background = Color3.fromRGB(64, 50, 71), Header = Color3.fromRGB(36, 28, 41), TextColor = Color3.fromRGB(255,255,255), ElementColor = Color3.fromRGB(74, 58, 84)},
+    Ocean = {SchemeColor = Color3.fromRGB(86, 76, 251), Background = Color3.fromRGB(26, 32, 58), Header = Color3.fromRGB(38, 45, 71), TextColor = Color3.fromRGB(200, 200, 200), ElementColor = Color3.fromRGB(38, 45, 71)},
+    Midnight = {SchemeColor = Color3.fromRGB(26, 189, 158), Background = Color3.fromRGB(44, 62, 82), Header = Color3.fromRGB(57, 81, 105), TextColor = Color3.fromRGB(255, 255, 255), ElementColor = Color3.fromRGB(52, 74, 95)},
+    Sentinel = {SchemeColor = Color3.fromRGB(230, 35, 69), Background = Color3.fromRGB(32, 32, 32), Header = Color3.fromRGB(24, 24, 24), TextColor = Color3.fromRGB(119, 209, 138), ElementColor = Color3.fromRGB(24, 24, 24)},
+    Synapse = {SchemeColor = Color3.fromRGB(46, 48, 43), Background = Color3.fromRGB(13, 15, 12), Header = Color3.fromRGB(36, 38, 35), TextColor = Color3.fromRGB(152, 99, 53), ElementColor = Color3.fromRGB(24, 24, 24)},
+    Serpent = {SchemeColor = Color3.fromRGB(0, 166, 58), Background = Color3.fromRGB(31, 41, 43), Header = Color3.fromRGB(22, 29, 31), TextColor = Color3.fromRGB(255,255,255), ElementColor = Color3.fromRGB(22, 29, 31)},
+    
+    -- TEMA TAMBAHAN (UI MODERN)
+    EugeneWu = {SchemeColor = Color3.fromRGB(255, 180, 50), Background = Color3.fromRGB(24, 24, 34), Header = Color3.fromRGB(30, 30, 42), TextColor = Color3.fromRGB(255, 255, 255), ElementColor = Color3.fromRGB(35, 35, 48)},
+    Dracula = {SchemeColor = Color3.fromRGB(255, 121, 198), Background = Color3.fromRGB(40, 42, 54), Header = Color3.fromRGB(68, 71, 90), TextColor = Color3.fromRGB(248, 248, 242), ElementColor = Color3.fromRGB(50, 52, 64)},
+    TokyoNight = {SchemeColor = Color3.fromRGB(122, 162, 247), Background = Color3.fromRGB(26, 27, 38), Header = Color3.fromRGB(36, 40, 59), TextColor = Color3.fromRGB(192, 202, 245), ElementColor = Color3.fromRGB(41, 46, 66)},
+    Discord = {SchemeColor = Color3.fromRGB(88, 101, 242), Background = Color3.fromRGB(54, 57, 63), Header = Color3.fromRGB(47, 49, 54), TextColor = Color3.fromRGB(220, 221, 222), ElementColor = Color3.fromRGB(64, 68, 75)}
 }
 
 local function Tween(instance, properties, duration)
@@ -23,11 +35,28 @@ local function Tween(instance, properties, duration)
     return tween
 end
 
-function FarmingLibrary:CreateWindow(titleText)
+-- ==========================================
+-- 🖥️ FUNGSI MEMBUAT WINDOW UTAMA
+-- ==========================================
+function FarmingLibrary:CreateWindow(titleText, selectedTheme)
     local UIHidden = false
 
+    -- Set Tema: Cek apakah tema yang diminta ada, kalau tidak pakai EugeneWu
+    local th = themeStyles[selectedTheme] or themeStyles["EugeneWu"]
+
+    -- Memetakan warna Kavo agar pas dengan animasi UI kita
+    local Theme = {
+        MainBG = th.Background,
+        SidebarBG = th.Header,
+        ElementBG = th.ElementColor,
+        HoverBG = Color3.fromRGB(math.clamp(th.ElementColor.R*255 + 15, 0, 255), math.clamp(th.ElementColor.G*255 + 15, 0, 255), math.clamp(th.ElementColor.B*255 + 15, 0, 255)),
+        Accent = th.SchemeColor,
+        Text = th.TextColor,
+        TextDark = Color3.fromRGB(math.clamp(th.TextColor.R*255 - 60, 0, 255), math.clamp(th.TextColor.G*255 - 60, 0, 255), math.clamp(th.TextColor.B*255 - 60, 0, 255))
+    }
+
     local ScreenGui = Instance.new("ScreenGui")
-    ScreenGui.Name = "EugeneWuCloneHub"
+    ScreenGui.Name = "CustomHubGUI"
     ScreenGui.ResetOnSpawn = false
     ScreenGui.Parent = PlayerGui
 
@@ -61,7 +90,6 @@ function FarmingLibrary:CreateWindow(titleText)
     ToggleButton.MouseEnter:Connect(function() Tween(ToggleButton, {BackgroundColor3 = Theme.HoverBG}) end)
     ToggleButton.MouseLeave:Connect(function() Tween(ToggleButton, {BackgroundColor3 = Theme.SidebarBG}) end)
 
-    -- LOGIKA DRAG KHUSUS UNTUK TOMBOL BULAT (Dengan Anti-Misclick)
     local dragToggle, dragInputToggle, dragStartToggle, startPosToggle
     local isDraggingToggle = false 
 
@@ -83,7 +111,7 @@ function FarmingLibrary:CreateWindow(titleText)
         if input == dragInputToggle and dragToggle then
             local delta = input.Position - dragStartToggle
             if delta.Magnitude > 5 then
-                isDraggingToggle = true -- Jika geser lebih dari 5 pixel, tandai sebagai Dragging
+                isDraggingToggle = true 
             end
             ToggleButton.Position = UDim2.new(startPosToggle.X.Scale, startPosToggle.X.Offset + delta.X, startPosToggle.Y.Scale, startPosToggle.Y.Offset + delta.Y)
         end
@@ -104,9 +132,8 @@ function FarmingLibrary:CreateWindow(titleText)
     MainCorner.CornerRadius = UDim.new(0, 8)
     MainCorner.Parent = MainFrame
 
-    -- Logika Buka/Tutup (Hanya berlaku jika tidak sedang di-drag)
     ToggleButton.MouseButton1Click:Connect(function()
-        if isDraggingToggle then return end -- Batalkan klik jika baru selesai digeser
+        if isDraggingToggle then return end 
         
         UIHidden = not UIHidden
         if UIHidden then
@@ -119,7 +146,6 @@ function FarmingLibrary:CreateWindow(titleText)
         end
     end)
 
-    -- Topbar & Fitur Geser UI Utama
     local Topbar = Instance.new("Frame")
     Topbar.Size = UDim2.new(1, 0, 0, 40)
     Topbar.BackgroundColor3 = Theme.SidebarBG
@@ -362,9 +388,3 @@ function FarmingLibrary:CreateWindow(titleText)
 end
 
 return FarmingLibrary
-
--- =====================================================================
--- 🚀 BAGIAN 2: AREA EKSEKUSI (PROJECT-SPECIFIC SCRIPT)
--- Di masa depan, Bagian 1 di atas akan dipanggil pakai Loadstring.
--- Kamu hanya perlu menulis kode mulai dari baris di bawah ini!
--- =====================================================================
