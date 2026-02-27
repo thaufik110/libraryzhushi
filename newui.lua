@@ -1,5 +1,5 @@
 -- =====================================================================
--- 🛠️ MYCUSTOM UI LIBRARY (ULTIMATE MULTI-THEME EDITION)
+-- 🛠️ MYCUSTOM UI LIBRARY (ULTIMATE MULTI-THEME + WINDOW CONTROLS)
 -- =====================================================================
 local TweenService = game:GetService("TweenService")
 local UserInputService = game:GetService("UserInputService")
@@ -8,7 +8,7 @@ local PlayerGui = game:GetService("Players").LocalPlayer:WaitForChild("PlayerGui
 local FarmingLibrary = {}
 
 -- ==========================================
--- 🎨 KOLEKSI TEMA (KAVO + TEMA MODERN BARU)
+-- 🎨 KOLEKSI TEMA
 -- ==========================================
 local themeStyles = {
     DarkTheme = {SchemeColor = Color3.fromRGB(64, 64, 64), Background = Color3.fromRGB(0, 0, 0), Header = Color3.fromRGB(0, 0, 0), TextColor = Color3.fromRGB(255,255,255), ElementColor = Color3.fromRGB(20, 20, 20)},
@@ -20,7 +20,6 @@ local themeStyles = {
     Sentinel = {SchemeColor = Color3.fromRGB(230, 35, 69), Background = Color3.fromRGB(32, 32, 32), Header = Color3.fromRGB(24, 24, 24), TextColor = Color3.fromRGB(119, 209, 138), ElementColor = Color3.fromRGB(24, 24, 24)},
     Synapse = {SchemeColor = Color3.fromRGB(46, 48, 43), Background = Color3.fromRGB(13, 15, 12), Header = Color3.fromRGB(36, 38, 35), TextColor = Color3.fromRGB(152, 99, 53), ElementColor = Color3.fromRGB(24, 24, 24)},
     Serpent = {SchemeColor = Color3.fromRGB(0, 166, 58), Background = Color3.fromRGB(31, 41, 43), Header = Color3.fromRGB(22, 29, 31), TextColor = Color3.fromRGB(255,255,255), ElementColor = Color3.fromRGB(22, 29, 31)},
-    
     EugeneWu = {SchemeColor = Color3.fromRGB(255, 180, 50), Background = Color3.fromRGB(24, 24, 34), Header = Color3.fromRGB(30, 30, 42), TextColor = Color3.fromRGB(255, 255, 255), ElementColor = Color3.fromRGB(35, 35, 48)},
     Dracula = {SchemeColor = Color3.fromRGB(255, 121, 198), Background = Color3.fromRGB(40, 42, 54), Header = Color3.fromRGB(68, 71, 90), TextColor = Color3.fromRGB(248, 248, 242), ElementColor = Color3.fromRGB(50, 52, 64)},
     TokyoNight = {SchemeColor = Color3.fromRGB(122, 162, 247), Background = Color3.fromRGB(26, 27, 38), Header = Color3.fromRGB(36, 40, 59), TextColor = Color3.fromRGB(192, 202, 245), ElementColor = Color3.fromRGB(41, 46, 66)},
@@ -38,7 +37,7 @@ end
 -- ==========================================
 function FarmingLibrary:CreateWindow(titleText, selectedTheme)
     local UIHidden = false
-    local lastMainFramePos = UDim2.new(0.5, -275, 0.5, -190) -- MEMORI POSISI AWAL
+    local lastMainFramePos = UDim2.new(0.5, -275, 0.5, -190)
 
     local th = themeStyles[selectedTheme] or themeStyles["EugeneWu"]
 
@@ -115,7 +114,7 @@ function FarmingLibrary:CreateWindow(titleText, selectedTheme)
     end)
 
     -- ==========================================
-    -- 🪟 KANVAS UI UTAMA (MAIN FRAME)
+    -- 🪟 KANVAS UI UTAMA
     -- ==========================================
     local MainFrame = Instance.new("Frame")
     MainFrame.Size = UDim2.new(0, 550, 0, 380)
@@ -129,24 +128,28 @@ function FarmingLibrary:CreateWindow(titleText, selectedTheme)
     MainCorner.CornerRadius = UDim.new(0, 8)
     MainCorner.Parent = MainFrame
 
-    -- PERBAIKAN LOGIKA BUKA/TUTUP (MEMORI POSISI)
-    ToggleButton.MouseButton1Click:Connect(function()
-        if isDraggingToggle then return end 
-        
+    -- Logika Klik Tombol Bulat
+    local function ToggleUI()
         UIHidden = not UIHidden
         if UIHidden then
-            -- MENCATAT POSISI TERAKHIR SEBELUM MENGHILANG
             lastMainFramePos = MainFrame.Position
             Tween(MainFrame, {Size = UDim2.new(0, 0, 0, 0), Position = UDim2.new(ToggleButton.Position.X.Scale, ToggleButton.Position.X.Offset, ToggleButton.Position.Y.Scale, ToggleButton.Position.Y.Offset)}, 0.3)
             wait(0.3)
             MainFrame.Visible = false
         else
             MainFrame.Visible = true
-            -- KEMBALI KE POSISI YANG SUDAH DICATAT
             Tween(MainFrame, {Size = UDim2.new(0, 550, 0, 380), Position = lastMainFramePos}, 0.3)
         end
+    end
+
+    ToggleButton.MouseButton1Click:Connect(function()
+        if isDraggingToggle then return end 
+        ToggleUI()
     end)
 
+    -- ==========================================
+    -- 🔝 TOPBAR & WINDOW CONTROLS (MINIMIZE & CLOSE)
+    -- ==========================================
     local Topbar = Instance.new("Frame")
     Topbar.Size = UDim2.new(1, 0, 0, 40)
     Topbar.BackgroundColor3 = Theme.SidebarBG
@@ -161,7 +164,7 @@ function FarmingLibrary:CreateWindow(titleText, selectedTheme)
     TopbarLine.Parent = Topbar
 
     local Title = Instance.new("TextLabel")
-    Title.Size = UDim2.new(1, -20, 1, 0)
+    Title.Size = UDim2.new(1, -100, 1, 0)
     Title.Position = UDim2.new(0, 20, 0, 0)
     Title.BackgroundTransparency = 1
     Title.Text = titleText
@@ -171,9 +174,47 @@ function FarmingLibrary:CreateWindow(titleText, selectedTheme)
     Title.TextXAlignment = Enum.TextXAlignment.Left
     Title.Parent = Topbar
 
+    -- ❌ TOMBOL CLOSE (MENGHANCURKAN UI)
+    local CloseBtn = Instance.new("TextButton")
+    CloseBtn.Size = UDim2.new(0, 35, 0, 35)
+    CloseBtn.Position = UDim2.new(1, -40, 0, 2)
+    CloseBtn.BackgroundTransparency = 1
+    CloseBtn.Text = "✕"
+    CloseBtn.TextColor3 = Theme.TextDark
+    CloseBtn.Font = Enum.Font.GothamBold
+    CloseBtn.TextSize = 16
+    CloseBtn.Parent = Topbar
+
+    CloseBtn.MouseEnter:Connect(function() Tween(CloseBtn, {TextColor3 = Color3.fromRGB(255, 75, 75)}) end)
+    CloseBtn.MouseLeave:Connect(function() Tween(CloseBtn, {TextColor3 = Theme.TextDark}) end)
+    CloseBtn.MouseButton1Click:Connect(function()
+        ScreenGui:Destroy()
+    end)
+
+    -- ➖ TOMBOL MINIMIZE (MENYEMBUNYIKAN UI)
+    local MinBtn = Instance.new("TextButton")
+    MinBtn.Size = UDim2.new(0, 35, 0, 35)
+    MinBtn.Position = UDim2.new(1, -75, 0, 2)
+    MinBtn.BackgroundTransparency = 1
+    MinBtn.Text = "—"
+    MinBtn.TextColor3 = Theme.TextDark
+    MinBtn.Font = Enum.Font.GothamBold
+    MinBtn.TextSize = 16
+    MinBtn.Parent = Topbar
+
+    MinBtn.MouseEnter:Connect(function() Tween(MinBtn, {TextColor3 = Theme.Accent}) end)
+    MinBtn.MouseLeave:Connect(function() Tween(MinBtn, {TextColor3 = Theme.TextDark}) end)
+    MinBtn.MouseButton1Click:Connect(function()
+        ToggleUI() -- Memanggil fungsi sembunyi yang sama dengan tombol bulat
+    end)
+
     local dragging, dragInput, dragStart, startPos
     Topbar.InputBegan:Connect(function(input)
         if input.UserInputType == Enum.UserInputType.MouseButton1 then
+            -- Mencegah drag kalau user klik tombol Close/Minimize
+            local x = input.Position.X
+            if x > MinBtn.AbsolutePosition.X then return end
+
             dragging = true; dragStart = input.Position; startPos = MainFrame.Position
             input.Changed:Connect(function()
                 if input.UserInputState == Enum.UserInputState.End then dragging = false end
@@ -190,6 +231,9 @@ function FarmingLibrary:CreateWindow(titleText, selectedTheme)
         end
     end)
 
+    -- ==========================================
+    -- 📁 SIDEBAR & TABS
+    -- ==========================================
     local Sidebar = Instance.new("Frame")
     Sidebar.Size = UDim2.new(0, 140, 1, -41)
     Sidebar.Position = UDim2.new(0, 0, 0, 41)
