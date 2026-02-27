@@ -1,5 +1,5 @@
 -- =====================================================================
--- 🛠️ MYCUSTOM UI LIBRARY (MULTI-THEME EDITION)
+-- 🛠️ MYCUSTOM UI LIBRARY (ULTIMATE MULTI-THEME EDITION)
 -- =====================================================================
 local TweenService = game:GetService("TweenService")
 local UserInputService = game:GetService("UserInputService")
@@ -11,7 +11,6 @@ local FarmingLibrary = {}
 -- 🎨 KOLEKSI TEMA (KAVO + TEMA MODERN BARU)
 -- ==========================================
 local themeStyles = {
-    -- TEMA BAWAAN KAVO
     DarkTheme = {SchemeColor = Color3.fromRGB(64, 64, 64), Background = Color3.fromRGB(0, 0, 0), Header = Color3.fromRGB(0, 0, 0), TextColor = Color3.fromRGB(255,255,255), ElementColor = Color3.fromRGB(20, 20, 20)},
     LightTheme = {SchemeColor = Color3.fromRGB(150, 150, 150), Background = Color3.fromRGB(255,255,255), Header = Color3.fromRGB(200, 200, 200), TextColor = Color3.fromRGB(0,0,0), ElementColor = Color3.fromRGB(224, 224, 224)},
     BloodTheme = {SchemeColor = Color3.fromRGB(227, 27, 27), Background = Color3.fromRGB(10, 10, 10), Header = Color3.fromRGB(5, 5, 5), TextColor = Color3.fromRGB(255,255,255), ElementColor = Color3.fromRGB(20, 20, 20)},
@@ -22,7 +21,6 @@ local themeStyles = {
     Synapse = {SchemeColor = Color3.fromRGB(46, 48, 43), Background = Color3.fromRGB(13, 15, 12), Header = Color3.fromRGB(36, 38, 35), TextColor = Color3.fromRGB(152, 99, 53), ElementColor = Color3.fromRGB(24, 24, 24)},
     Serpent = {SchemeColor = Color3.fromRGB(0, 166, 58), Background = Color3.fromRGB(31, 41, 43), Header = Color3.fromRGB(22, 29, 31), TextColor = Color3.fromRGB(255,255,255), ElementColor = Color3.fromRGB(22, 29, 31)},
     
-    -- TEMA TAMBAHAN (UI MODERN)
     EugeneWu = {SchemeColor = Color3.fromRGB(255, 180, 50), Background = Color3.fromRGB(24, 24, 34), Header = Color3.fromRGB(30, 30, 42), TextColor = Color3.fromRGB(255, 255, 255), ElementColor = Color3.fromRGB(35, 35, 48)},
     Dracula = {SchemeColor = Color3.fromRGB(255, 121, 198), Background = Color3.fromRGB(40, 42, 54), Header = Color3.fromRGB(68, 71, 90), TextColor = Color3.fromRGB(248, 248, 242), ElementColor = Color3.fromRGB(50, 52, 64)},
     TokyoNight = {SchemeColor = Color3.fromRGB(122, 162, 247), Background = Color3.fromRGB(26, 27, 38), Header = Color3.fromRGB(36, 40, 59), TextColor = Color3.fromRGB(192, 202, 245), ElementColor = Color3.fromRGB(41, 46, 66)},
@@ -40,11 +38,10 @@ end
 -- ==========================================
 function FarmingLibrary:CreateWindow(titleText, selectedTheme)
     local UIHidden = false
+    local lastMainFramePos = UDim2.new(0.5, -275, 0.5, -190) -- MEMORI POSISI AWAL
 
-    -- Set Tema: Cek apakah tema yang diminta ada, kalau tidak pakai EugeneWu
     local th = themeStyles[selectedTheme] or themeStyles["EugeneWu"]
 
-    -- Memetakan warna Kavo agar pas dengan animasi UI kita
     local Theme = {
         MainBG = th.Background,
         SidebarBG = th.Header,
@@ -61,7 +58,7 @@ function FarmingLibrary:CreateWindow(titleText, selectedTheme)
     ScreenGui.Parent = PlayerGui
 
     -- ==========================================
-    -- 🟢 TOMBOL BULAT (BISA DIGESER / DRAGGABLE)
+    -- 🟢 TOMBOL BULAT (FLOATING BUTTON)
     -- ==========================================
     local ToggleButton = Instance.new("ImageButton")
     ToggleButton.Size = UDim2.new(0, 45, 0, 45)
@@ -118,11 +115,11 @@ function FarmingLibrary:CreateWindow(titleText, selectedTheme)
     end)
 
     -- ==========================================
-    -- 🪟 KANVAS UI UTAMA
+    -- 🪟 KANVAS UI UTAMA (MAIN FRAME)
     -- ==========================================
     local MainFrame = Instance.new("Frame")
     MainFrame.Size = UDim2.new(0, 550, 0, 380)
-    MainFrame.Position = UDim2.new(0.5, -275, 0.5, -190)
+    MainFrame.Position = lastMainFramePos
     MainFrame.BackgroundColor3 = Theme.MainBG
     MainFrame.BorderSizePixel = 0
     MainFrame.ClipsDescendants = true
@@ -132,17 +129,21 @@ function FarmingLibrary:CreateWindow(titleText, selectedTheme)
     MainCorner.CornerRadius = UDim.new(0, 8)
     MainCorner.Parent = MainFrame
 
+    -- PERBAIKAN LOGIKA BUKA/TUTUP (MEMORI POSISI)
     ToggleButton.MouseButton1Click:Connect(function()
         if isDraggingToggle then return end 
         
         UIHidden = not UIHidden
         if UIHidden then
+            -- MENCATAT POSISI TERAKHIR SEBELUM MENGHILANG
+            lastMainFramePos = MainFrame.Position
             Tween(MainFrame, {Size = UDim2.new(0, 0, 0, 0), Position = UDim2.new(ToggleButton.Position.X.Scale, ToggleButton.Position.X.Offset, ToggleButton.Position.Y.Scale, ToggleButton.Position.Y.Offset)}, 0.3)
             wait(0.3)
             MainFrame.Visible = false
         else
             MainFrame.Visible = true
-            Tween(MainFrame, {Size = UDim2.new(0, 550, 0, 380), Position = UDim2.new(0.5, -275, 0.5, -190)}, 0.3)
+            -- KEMBALI KE POSISI YANG SUDAH DICATAT
+            Tween(MainFrame, {Size = UDim2.new(0, 550, 0, 380), Position = lastMainFramePos}, 0.3)
         end
     end)
 
@@ -294,6 +295,7 @@ function FarmingLibrary:CreateWindow(titleText, selectedTheme)
 
         local TabAPI = {}
 
+        -- SECTION
         function TabAPI:CreateSection(secName)
             local SecLabel = Instance.new("TextLabel")
             SecLabel.Size = UDim2.new(1, 0, 0, 20)
@@ -306,6 +308,7 @@ function FarmingLibrary:CreateWindow(titleText, selectedTheme)
             SecLabel.Parent = TabPage
         end
 
+        -- BUTTON
         function TabAPI:CreateButton(btnName, callback)
             local Btn = Instance.new("TextButton")
             Btn.Size = UDim2.new(1, 0, 0, 40)
@@ -327,6 +330,7 @@ function FarmingLibrary:CreateWindow(titleText, selectedTheme)
             Btn.MouseButton1Click:Connect(function() pcall(callback) end)
         end
 
+        -- TOGGLE
         function TabAPI:CreateToggle(tglName, default, callback)
             local state = default or false
 
@@ -378,6 +382,263 @@ function FarmingLibrary:CreateWindow(titleText, selectedTheme)
                     Tween(SwitchCircle, {Position = UDim2.new(0, 2, 0.5, -7)})
                 end
                 pcall(callback, state)
+            end)
+        end
+
+        -- SLIDER
+        function TabAPI:CreateSlider(slName, min, max, default, callback)
+            local value = math.clamp(default, min, max)
+
+            local Sl = Instance.new("Frame")
+            Sl.Size = UDim2.new(1, 0, 0, 55)
+            Sl.BackgroundColor3 = Theme.ElementBG
+            Sl.Parent = TabPage
+
+            local SlCorner = Instance.new("UICorner")
+            SlCorner.CornerRadius = UDim.new(0, 6)
+            SlCorner.Parent = Sl
+
+            local Title = Instance.new("TextLabel")
+            Title.Size = UDim2.new(1, -20, 0, 25)
+            Title.Position = UDim2.new(0, 10, 0, 5)
+            Title.BackgroundTransparency = 1
+            Title.Text = slName
+            Title.TextColor3 = Theme.Text
+            Title.Font = Enum.Font.Gotham
+            Title.TextSize = 14
+            Title.TextXAlignment = Enum.TextXAlignment.Left
+            Title.Parent = Sl
+
+            local ValLabel = Instance.new("TextLabel")
+            ValLabel.Size = UDim2.new(1, -20, 0, 25)
+            ValLabel.Position = UDim2.new(0, 10, 0, 5)
+            ValLabel.BackgroundTransparency = 1
+            ValLabel.Text = tostring(value)
+            ValLabel.TextColor3 = Theme.Accent
+            ValLabel.Font = Enum.Font.GothamBold
+            ValLabel.TextSize = 14
+            ValLabel.TextXAlignment = Enum.TextXAlignment.Right
+            ValLabel.Parent = Sl
+
+            local BarBG = Instance.new("TextButton")
+            BarBG.Size = UDim2.new(1, -20, 0, 8)
+            BarBG.Position = UDim2.new(0, 10, 0, 35)
+            BarBG.BackgroundColor3 = Theme.MainBG
+            BarBG.Text = ""
+            BarBG.AutoButtonColor = false
+            BarBG.Parent = Sl
+
+            local BarCorner = Instance.new("UICorner")
+            BarCorner.CornerRadius = UDim.new(1, 0)
+            BarCorner.Parent = BarBG
+
+            local BarFill = Instance.new("Frame")
+            local percentage = (value - min) / (max - min)
+            BarFill.Size = UDim2.new(percentage, 0, 1, 0)
+            BarFill.BackgroundColor3 = Theme.Accent
+            BarFill.Parent = BarBG
+
+            local FillCorner = Instance.new("UICorner")
+            FillCorner.CornerRadius = UDim.new(1, 0)
+            FillCorner.Parent = BarFill
+
+            local isDragging = false
+            local function UpdateSlider(input)
+                local pos = math.clamp((input.Position.X - BarBG.AbsolutePosition.X) / BarBG.AbsoluteSize.X, 0, 1)
+                value = math.floor(((max - min) * pos) + min)
+                ValLabel.Text = tostring(value)
+                Tween(BarFill, {Size = UDim2.new(pos, 0, 1, 0)}, 0.05)
+                pcall(callback, value)
+            end
+
+            BarBG.InputBegan:Connect(function(input)
+                if input.UserInputType == Enum.UserInputType.MouseButton1 then
+                    isDragging = true; UpdateSlider(input)
+                end
+            end)
+            UserInputService.InputEnded:Connect(function(input)
+                if input.UserInputType == Enum.UserInputType.MouseButton1 then isDragging = false end
+            end)
+            UserInputService.InputChanged:Connect(function(input)
+                if isDragging and input.UserInputType == Enum.UserInputType.MouseMovement then UpdateSlider(input) end
+            end)
+        end
+
+        -- DROPDOWN
+        function TabAPI:CreateDropdown(dropName, options, callback)
+            local isOpen = false
+
+            local DropFrame = Instance.new("Frame")
+            DropFrame.Size = UDim2.new(1, 0, 0, 36)
+            DropFrame.BackgroundColor3 = Theme.ElementBG
+            DropFrame.ClipsDescendants = true
+            DropFrame.Parent = TabPage
+
+            local DropCorner = Instance.new("UICorner")
+            DropCorner.CornerRadius = UDim.new(0, 6)
+            DropCorner.Parent = DropFrame
+
+            local DropBtn = Instance.new("TextButton")
+            DropBtn.Size = UDim2.new(1, 0, 0, 36)
+            DropBtn.BackgroundTransparency = 1
+            DropBtn.Text = "  " .. dropName .. " : -"
+            DropBtn.TextColor3 = Theme.Text
+            DropBtn.Font = Enum.Font.Gotham
+            DropBtn.TextSize = 14
+            DropBtn.TextXAlignment = Enum.TextXAlignment.Left
+            DropBtn.Parent = DropFrame
+
+            local Arrow = Instance.new("TextLabel")
+            Arrow.Size = UDim2.new(0, 30, 0, 36)
+            Arrow.Position = UDim2.new(1, -30, 0, 0)
+            Arrow.BackgroundTransparency = 1
+            Arrow.Text = "▼"
+            Arrow.TextColor3 = Theme.TextDark
+            Arrow.Font = Enum.Font.Gotham
+            Arrow.TextSize = 14
+            Arrow.Parent = DropBtn
+
+            local OptionContainer = Instance.new("Frame")
+            OptionContainer.Size = UDim2.new(1, 0, 1, -36)
+            OptionContainer.Position = UDim2.new(0, 0, 0, 36)
+            OptionContainer.BackgroundTransparency = 1
+            OptionContainer.Parent = DropFrame
+
+            local OptionLayout = Instance.new("UIListLayout")
+            OptionLayout.SortOrder = Enum.SortOrder.LayoutOrder
+            OptionLayout.Parent = OptionContainer
+
+            DropBtn.MouseButton1Click:Connect(function()
+                isOpen = not isOpen
+                if isOpen then
+                    Tween(DropFrame, {Size = UDim2.new(1, 0, 0, 36 + (#options * 32))})
+                    Tween(Arrow, {Rotation = 180})
+                else
+                    Tween(DropFrame, {Size = UDim2.new(1, 0, 0, 36)})
+                    Tween(Arrow, {Rotation = 0})
+                end
+            end)
+
+            for _, option in ipairs(options) do
+                local OptBtn = Instance.new("TextButton")
+                OptBtn.Size = UDim2.new(1, 0, 0, 32)
+                OptBtn.BackgroundColor3 = Theme.HoverBG
+                OptBtn.Text = "    " .. option
+                OptBtn.TextColor3 = Theme.TextDark
+                OptBtn.Font = Enum.Font.Gotham
+                OptBtn.TextSize = 13
+                OptBtn.TextXAlignment = Enum.TextXAlignment.Left
+                OptBtn.AutoButtonColor = false
+                OptBtn.Parent = OptionContainer
+
+                OptBtn.MouseEnter:Connect(function() Tween(OptBtn, {TextColor3 = Theme.Accent}) end)
+                OptBtn.MouseLeave:Connect(function() Tween(OptBtn, {TextColor3 = Theme.TextDark}) end)
+
+                OptBtn.MouseButton1Click:Connect(function()
+                    DropBtn.Text = "  " .. dropName .. " : " .. option
+                    isOpen = false
+                    Tween(DropFrame, {Size = UDim2.new(1, 0, 0, 36)})
+                    Tween(Arrow, {Rotation = 0})
+                    pcall(callback, option)
+                end)
+            end
+        end
+
+        -- TEXTBOX
+        function TabAPI:CreateTextBox(boxName, placeholder, callback)
+            local BoxFrame = Instance.new("Frame")
+            BoxFrame.Size = UDim2.new(1, 0, 0, 40)
+            BoxFrame.BackgroundColor3 = Theme.ElementBG
+            BoxFrame.Parent = TabPage
+            
+            local BoxCorner = Instance.new("UICorner")
+            BoxCorner.CornerRadius = UDim.new(0, 6)
+            BoxCorner.Parent = BoxFrame
+            
+            local Label = Instance.new("TextLabel")
+            Label.Size = UDim2.new(0.5, 0, 1, 0)
+            Label.Position = UDim2.new(0, 10, 0, 0)
+            Label.BackgroundTransparency = 1
+            Label.Text = boxName
+            Label.TextColor3 = Theme.Text
+            Label.Font = Enum.Font.Gotham
+            Label.TextSize = 14
+            Label.TextXAlignment = Enum.TextXAlignment.Left
+            Label.Parent = BoxFrame
+            
+            local Box = Instance.new("TextBox")
+            Box.Size = UDim2.new(0.45, -10, 0, 26)
+            Box.Position = UDim2.new(0.5, 0, 0.5, -13)
+            Box.BackgroundColor3 = Theme.MainBG
+            Box.TextColor3 = Theme.Text
+            Box.PlaceholderText = placeholder
+            Box.Font = Enum.Font.Gotham
+            Box.TextSize = 13
+            Box.Parent = BoxFrame
+            
+            local UICorner = Instance.new("UICorner")
+            UICorner.CornerRadius = UDim.new(0, 4)
+            UICorner.Parent = Box
+            
+            Box.FocusLost:Connect(function(enterPressed)
+                pcall(callback, Box.Text)
+            end)
+        end
+
+        -- KEYBIND
+        function TabAPI:CreateKeybind(keyName, defaultKey, callback)
+            local key = defaultKey
+            local isBinding = false
+
+            local KeyFrame = Instance.new("Frame")
+            KeyFrame.Size = UDim2.new(1, 0, 0, 36)
+            KeyFrame.BackgroundColor3 = Theme.ElementBG
+            KeyFrame.Parent = TabPage
+            
+            local KeyCorner = Instance.new("UICorner")
+            KeyCorner.CornerRadius = UDim.new(0, 6)
+            KeyCorner.Parent = KeyFrame
+
+            local Label = Instance.new("TextLabel")
+            Label.Size = UDim2.new(0.5, 0, 1, 0)
+            Label.Position = UDim2.new(0, 10, 0, 0)
+            Label.BackgroundTransparency = 1
+            Label.Text = keyName
+            Label.TextColor3 = Theme.Text
+            Label.Font = Enum.Font.Gotham
+            Label.TextSize = 14
+            Label.TextXAlignment = Enum.TextXAlignment.Left
+            Label.Parent = KeyFrame
+
+            local KeyBtn = Instance.new("TextButton")
+            KeyBtn.Size = UDim2.new(0, 80, 0, 24)
+            KeyBtn.Position = UDim2.new(1, -90, 0.5, -12)
+            KeyBtn.BackgroundColor3 = Theme.MainBG
+            KeyBtn.Text = key.Name
+            KeyBtn.TextColor3 = Theme.Accent
+            KeyBtn.Font = Enum.Font.GothamBold
+            KeyBtn.TextSize = 13
+            KeyBtn.Parent = KeyFrame
+
+            local BtnCorner = Instance.new("UICorner")
+            BtnCorner.CornerRadius = UDim.new(0, 4)
+            BtnCorner.Parent = KeyBtn
+
+            KeyBtn.MouseButton1Click:Connect(function()
+                isBinding = true
+                KeyBtn.Text = "..."
+                KeyBtn.TextColor3 = Color3.fromRGB(255, 50, 50) 
+            end)
+
+            UserInputService.InputBegan:Connect(function(input, gpe)
+                if isBinding and input.UserInputType == Enum.UserInputType.Keyboard then
+                    key = input.KeyCode
+                    KeyBtn.Text = key.Name
+                    KeyBtn.TextColor3 = Theme.Accent
+                    isBinding = false
+                elseif not gpe and input.KeyCode == key and not isBinding then
+                    pcall(callback)
+                end
             end)
         end
 
